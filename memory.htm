@@ -2,37 +2,43 @@
 <html>
 	<head>
 		<title>Memory Maker</title>
+
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="./lib/knockout.js"></script>
 		<script  type="text/javascript" src="./lib/canvaskit.all.js"></script>
 		<script  type="text/javascript" src="./memorymaker.js"></script>
 	</head>
+	<style>
+		@media print {
+			.no-print, .no-print * {
+				display: none !important;
+			}
+		}
+
+	</style>
 	<body>
-		
-		
-		
-		
+		<div class="no-print">
+			<textarea  id="words" cols="40" rows="10" data-bind="value: words, visible: display"></textarea>			
+
+
+			<button data-bind="click: loadAndDisplay, visible: display">
+				generate
+			</button>
+			<button data-bind="click: deleteContent, visible: display">
+				clear
+			</button>
+		</div>
 		<div id="memorypane">
 			<canvas id="makercanvas" width="640" height="800"></canvas>
 		</div>
-		
+
 		<script>
-			
 			window.addEventListener("load", function() {
-				
-				var controller = new memorymaker.Controller($("#makercanvas")[0]);
-				controller.setup(new CanvasKit.Point(100,200));
-				controller.addCard("bis");
-				controller.addCard("until");
-				controller.addCard("Haus");
-				controller.addCard("house");
-				controller.addCard("Briefumschlag");
-				controller.addCard("envelope");
-				
-				controller.draw();
-				
+
+				var vm = new memorymaker.VM($("#makercanvas")[0]);
+				ko.applyBindings(vm);
 			});
-			
-			
+
 		</script>
-			</body>
+	</body>
 </html>
