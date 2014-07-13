@@ -9,7 +9,7 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 				this.display = ko.observable(true);
 				this.words = ko.observable();
 				this.controller = new memorymaker.Controller(canvas);
-				this.controller.setup(new CanvasKit.Point(100,200));
+				this.controller.setup(new CanvasKit.Point(150,150));
 				this.deleteContent = function ()
 				{
 					this.controller.deleteContent();
@@ -47,11 +47,57 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 				
 				
 				this.groundContent = topleft.clone();
+				
+				this.groundContentStyle = new CanvasKit.ContentStyle();
+				this.groundContentStyle.fill = false;
+				this.groundContentStyle.bordercolor = "lightgrey";
+				
+				
+			   	this.tlcontent = cardbasetl.clone();
+				this.elementsize = cardSize.clone();
+				this.cardsize = cardbasesize.clone(); 
+				
+				
+				this.baseContent =  new CanvasKit.Rectangle(this.groundContent, this.elementsize, this.groundContentStyle);
+				
+				this.rectContent =  new CanvasKit.Rectangle(this.tlcontent, this.cardsize, contentstyle);
+				
+				
+			}
+			card.prototype = {
+				
+				render : function (canvas,ctxt)
+				{
+					this.baseContent.render(canvas,ctxt);
+					this.rectContent.render(canvas,ctxt);
+				}
+			};
+			
+			
+			return card;
+			
+		}());
+		memorymaker.DoubleCard = (function (){
+			
+			function card (topleft, cardSize, contentstyle)
+			{
+				var factor = 4;
+				var cardbasesize = cardSize.clone();
+				cardbasesize.x -= 2*factor;
+				cardbasesize.y -= 2*factor;
+				
+				var cardbasetl = topleft.clone();
+				cardbasetl.x += factor; 
+				cardbasetl.y += factor;
+				
+				
+				this.groundContent = topleft.clone();
 				this.groundMemory = topleft.clone();this.groundMemory.y +=cardSize.y /2;
 				
 				this.groundContentStyle = new CanvasKit.ContentStyle();
 				this.groundContentStyle.fill = false;
 				this.groundContentStyle.bordercolor = "lightgrey";
+				
 				
 			   	this.tlcontent = cardbasetl.clone();
 			   	this.tllabel = cardbasetl.clone(); this.tllabel.y = this.tllabel.y + cardSize.y /2;
@@ -61,6 +107,8 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 				this.contentMemory = new CanvasKit.ContentStyle();
 				this.contentMemory.fill = false;
 				this.contentMemory.text = "memory";
+				this.contentMemory.textangle = 45;
+				
 				
 				this.baseContent =  new CanvasKit.Rectangle(this.groundContent, this.elementsize, this.groundContentStyle);
 				this.baseMemory =  new CanvasKit.Rectangle(this.groundMemory, this.elementsize,this.groundContentStyle);
@@ -126,7 +174,7 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 
 					setup : function(elementsize) {
 						this.elementsize = elementsize;
-						this.cursor = new memorymaker.Cursor(6, 100, this.elementsize);
+						this.cursor = new memorymaker.Cursor(4, 100, this.elementsize);
 					},
 					addCard : function(txt) {
 						var tl = this.cursor.next();
@@ -142,6 +190,8 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 						var cs = new CanvasKit.ContentStyle();
 						cs.fill = false;
 						cs.text = text;
+						cs.textangle = 45;
+						cs.textsize = -1;
 						return cs;
 					},
 					deleteContent: function ()
