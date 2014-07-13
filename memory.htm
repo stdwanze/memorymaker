@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Memory Maker</title>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script  type="text/javascript" src="./lib/canvaskit.all.js"></script>
+		<script  type="text/javascript" src="./memorymaker.js"></script>
+	</head>
+	<body>
+		
+		
+		
+		
+		<div id="memorypane">
+			<canvas id="makercanvas" width="640" height="800"></canvas>
+		</div>
+		
+		<script>
+			
+			window.addEventListener("load", function() {
+				
+				var controller = new memorymaker.Controller($("#makercanvas")[0]);
+				controller.setup(new CanvasKit.Point(100,200));
+				controller.addCard("bis");
+				controller.addCard("until");
+				controller.addCard("Haus");
+				controller.addCard("house");
+				controller.addCard("Briefumschlag");
+				controller.addCard("envelope");
+				
+				controller.draw();
+				
+			});
+			
+			
+		</script>
+			</body>
+</html>
