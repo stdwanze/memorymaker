@@ -4,11 +4,14 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 
 		memorymaker.VM = (function (){
 			
-			function vm (canvas)
+			function vm (canvashost)
 			{
 				this.display = ko.observable(true);
 				this.words = ko.observable();
-				this.controller = new memorymaker.Controller(canvas);
+				this.canvashost = canvashost;
+				this.canvas = null;
+				this.ctxt = null;
+				this.controller = new memorymaker.Controller(this);
 				this.controller.setup(new CanvasKit.Point(150,150));
 				this.deleteContent = function ()
 				{
@@ -16,6 +19,7 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 				};
 				this.loadAndDisplay = function ()
 				{
+					this.controller.deleteContent();
 					var rawInput = this.words();
 					var elements = rawInput.split(/[\n|,|;|\t]/);
 					
@@ -28,6 +32,27 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 					//this.display(false);
 					
 					this.controller.draw();
+				};
+				
+				this.create = function (size)
+				{
+					    var canv = document.createElement('canvas'); // creates new canvas element
+					    canv.id = 'canvas'; // gives canvas id
+					    canv.height = size.y; //get original canvas height
+					    canv.width = size.x; // get original canvas width
+					    document.getElementById(this.canvashost).appendChild(canv);
+					    
+					    this.canvas = canv;
+					    this.ctxt = this.canvas.getContext('2d');
+				};
+				this.dispose = function ()
+				{
+					if(this.canvas !== null){
+						 document.getElementById(this.canvashost).removeChild(document.getElementById("canvas"));
+						 this.canvas = null;
+						 this.ctxt = null;
+					}
+					
 				};
 			}
 			return vm;
@@ -148,10 +173,21 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 						if (this.currCol > this.columns - 1) {
 							this.currCol = 0;
 							this.currRow += 1;
+							if(this.currRow % 6 == 0) this.currRow +=1;
+							
 						}
 
 						return new CanvasKit.Point(this.currCol * this.elementsize.x, this.currRow * elementsize.y);
 
+					};
+					
+					this.getCurrentColumnCount = function ()
+					{
+						return this.columns;
+					};
+					this.getCurrentRowCount = function ()
+					{
+						return this.currRow+1;
 					};
 				}
 
@@ -161,10 +197,9 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 
 		memorymaker.Controller = ( function() {
 
-				function controller(canvas) {
-					this.canvas = canvas;
-					this.ctxt = canvas.getContext("2d");
-
+				function controller(canvasmanager) {
+					
+					this.canvasmanager = canvasmanager;
 					this.shapes = [];
 
 				}
@@ -182,8 +217,10 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 						this.shapes.push(contentRect);
 					},
 					draw : function() {
+						this.canvasmanager.create(this.calcDimentions());
+						
 						this.shapes.forEach(function(item) {
-							item.render(this.canvas, this.ctxt);
+							item.render(this.canvasmanager.canvas, this.canvasmanager.ctxt);
 						}.bind(this));
 					},
 					contentstyle : function(text) {
@@ -197,7 +234,17 @@ var memorymaker = window.memorymaker || {}; ( function(memorymaker) {
 					deleteContent: function ()
 					{
 						this.shapes = [];
-						this.ctxt.clearRect(0, 0, this.canvas.width, this.canvas.height);
+						this.canvasmanager.dispose();
+						this.cursor = new memorymaker.Cursor(4, 1000, this.elementsize);
+						//this.ctxt.clearRect(0, 0, this.canvas.width, this.canvas.height);
+					},
+					calcDimentions: function ()
+					{
+						var margin = 50;
+						var cols = this.cursor.getCurrentColumnCount();
+						var rows = this.cursor.getCurrentRowCount();
+						
+						return new CanvasKit.Point(cols*this.elementsize.x+margin,rows*this.elementsize.y+margin);
 					}
 				};
 				return controller;

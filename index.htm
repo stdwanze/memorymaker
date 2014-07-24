@@ -29,13 +29,13 @@
 			</button>
 		</div>
 		<div id="memorypane">
-			<canvas id="makercanvas" width="640" height="800"></canvas>
+	<!--		<canvas id="makercanvas" width="640" height="800"></canvas>-->
 		</div>
 
 		<script>
 			window.addEventListener("load", function() {
 
-				var vm = new memorymaker.VM($("#makercanvas")[0]);
+				var vm = new memorymaker.VM("memorypane");
 				ko.applyBindings(vm);
 			});
 
